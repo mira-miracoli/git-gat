@@ -223,20 +223,26 @@ slurm_config:
   SelectTypeParameters: CR_CPU_Memory  # Allocate individual cores/memory instead of entire node
 
 # RabbitMQ
-rabbitmq_version: 3.8.35-1
+rabbitmq_container:
+  name: rabbit_hole
+  image: rabbitmq:3.9.11
+  hostname: "{{ inventory_hostname }}"
+
 rabbitmq_plugins: rabbitmq_management
 
 rabbitmq_config:
-- rabbit:
-  - tcp_listeners:
-    - "'127.0.0.1'": 5672
-  - ssl_listeners:
-    - "'0.0.0.0'": 5671
-  - ssl_options:
-     - cacertfile: /etc/ssl/certs/fullchain.pem
-     - certfile: /etc/ssl/certs/cert.pem
-     - keyfile: /etc/ssl/user/privkey-rabbitmq.pem
-     - fail_if_no_peer_cert: 'false'
+  listeners:
+    tcp: none
+  ssl_listeners:
+    default: 5671
+  ssl_options:
+    cacertfile: /etc/ssl/certs/fullchain.pem
+    certfile: /etc/ssl/certs/cert.pem
+    keyfile: /etc/ssl/user/privkey-rabbitmq.pem
+    verify: verify_peer
+    fail_if_no_peer_cert: "false"
+  management_agent:
+    disable_metrics_collector: "false"
 
 rabbitmq_vhosts:
   - /pulsar/galaxy_au
